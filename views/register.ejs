@@ -1,0 +1,24 @@
+<%- include("partials/header") %>
+    <div class="container form-wrapper">
+
+        <h1>Sign Up</h1>
+        <form method="POST" action="/register" class="signup-form">
+            <div class="mb-3">
+                <label for="username" class="form-label">User Name</label>
+                <input required type="text" class="form-control" name="username" id="username"
+                    aria-describedby="emailHelp">
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input required type="password" class="form-control" id="password" name="password">
+            </div>
+
+            <button type="submit" class="btn btn-primary">sign up</button>
+            <button class="btn btn-primary">
+                <a href="/login" style="color: white; text-decoration: none;">log in</a>
+            </button>
+        </form>
+
+    </div>
+
+    <%- include("partials/footer") %>

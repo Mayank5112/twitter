@@ -1,0 +1,12 @@
+<%- include("partials/header") %>
+    <div class="container">
+        <h1>
+            <%=currUser.userName %>
+        </h1>
+        <form action="/logout" method="POST">
+            <button type="submit" class="btn btn-light">logout</button>
+        </form>
+    </div>
+
+
+    <%- include("partials/footer") %>

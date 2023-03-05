@@ -1,0 +1,25 @@
+<%- include("partials/header") %>
+
+    <div class="container">
+        <h4>all posts should be here</h4>
+        <% posts.forEach(element=> { %>
+            <div>
+                <h2>
+                    <%=element.userName%>
+                </h2>
+                <h3>
+                    <%=element.title%>
+                </h3>
+                <p>
+                    <%=element.content %>
+                </p>
+            </div>
+            <% }); %>
+                <form action="/logout" method="POST">
+                    <button type="submit" class="btn btn-light">logout</button>
+                </form>
+                <button><a href="compose/<%=currUser.userName%>">add</a></button>
+    </div>
+
+
+    <%- include("partials/footer") %>
