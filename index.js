@@ -7,6 +7,8 @@ const Blog = require('./models/blog')
 const { response } = require("express");
 const bcrypt = require('bcrypt');
 const session = require('express-session');
+const http = require("http");
+const { collection } = require("./models/user");
 const app = express();
 
 app.set('view engine', 'ejs');
@@ -22,7 +24,8 @@ app.use(session({
 // login middleware
 const requireLogin = (req, res, next) => {
     if (!req.session.user_id) {
-        return res.redirect("/login");
+        return res.send("login required")
+        // return res.redirect("/login");
     }
     next();
 }
@@ -31,7 +34,10 @@ app.get("/home", requireLogin, async (req, res) => {
     const currId = req.session.user_id
     const currUser = await User.findById({ _id: currId })
     const allPost = await Blog.find({});
-    res.render("home", { currUser: currUser, posts: allPost })
+    res.json({
+        "currUser": currUser, "posts": allPost
+    })
+    // res.render("home", { currUser: currUser, posts: allPost })
 })
 // login routes
 app.get("/login", (req, res) => {
@@ -43,9 +49,12 @@ app.post("/login", async (req, res) => {
     const foundUser = await User.findAndValidate(username, password);
     if (foundUser) {
         req.session.user_id = foundUser._id;
-        res.redirect("/home")
+        res.json({
+            "currUser": foundUser.userName
+        })
+        // res.redirect("/home")
     } else {
-        res.redirect("/login");
+        res.end("something is wrong")
     }
 });
 
@@ -56,32 +65,46 @@ app.get("/register", async (req, res) => {
 
 app.post("/register", async (req, res) => {
     const { username, password } = req.body;
-    const newUser = User({ userName: username, password: password })
-    await newUser.save();
-    req.session.user_id = newUser._id;
-    res.redirect("/home")
+    const check = User.findOne({ username });
+    if (check) {
+        res.send("user already exist");
+    } else {
+
+        const newUser = User({ userName: username, password: password });
+        const newCollection = Blog({ userName: username });
+        await newUser.save();
+        await newCollection.save();
+        req.session.user_id = newUser._id;
+        res.json({
+            "collection": newCollection,
+            "user": newUser
+        })
+    }
+    // res.redirect("/home");
 })
 
 app.get("/profile", requireLogin, async (req, res) => {
     const currId = req.session.user_id
     const currUser = await User.findById({ _id: currId })
-    res.render("profile", { currUser: currUser })
+    res.render("profile", { currUser: currUser.userName })
 })
 
 
 
 // compose tweet
 
-app.get("/compose/:userId", requireLogin, (req, res) => {
+app.get("/compose/:userID", requireLogin, (req, res) => {
     const currUser = req.params.userId;
     res.render("compose", { currUser })
 })
 
-app.post("/compose/:userID", async (req, res) => {
-    const { title, content } = req.body;
-    const newBlog = Blog({ title: title, content: content, userName: req.params.userID });
-    await newBlog.save();
-    res.redirect("/home")
+app.post("/compose/:userID", requireLogin, async (req, res) => {
+    const user = req.params.userID;
+    const newPost = { title: req.body.title, content: req.body.content };
+    console.log(newPost);
+    const userCollection = await Blog.findOneAndUpdate({ userName: user }, { $push: { tweets: newPost } });
+    res.send("userCollection");
+    // res.redirect("/home")
 })
 app.get("/info", (req, res) => {
     res.render("info")
