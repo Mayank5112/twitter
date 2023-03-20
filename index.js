@@ -101,13 +101,27 @@ app.get("/compose/:userID", requireLogin, (req, res) => {
 app.post("/compose/:userID", requireLogin, async (req, res) => {
     const user = req.params.userID;
     const newPost = { title: req.body.title, content: req.body.content };
-    console.log(newPost);
     const userCollection = await Blog.findOneAndUpdate({ userName: user }, { $push: { tweets: newPost } });
-    res.send("userCollection");
+    res.send(userCollection);
     // res.redirect("/home")
 })
 app.get("/info", (req, res) => {
     res.render("info")
+})
+
+// edit a tweet
+
+app.put("/edit/:userID", async (req, res) => {
+    const tweetId = req.query._id;
+    const user = req.body.userID;
+    const tweet = "ankit ko dikha raha hu edit route";
+    const doc = await Blog.findOneAndUpdate({ user, "tweets._id": tweetId }, {
+        $set: {
+            "tweets.$.content": tweet
+        }
+    });
+    console.log(doc);
+    res.send(doc);
 })
 
 // logout
