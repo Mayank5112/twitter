@@ -1,5 +1,4 @@
-const { logger } = require('mongodb');
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 mongoose.set('strictQuery', false);
 
 mongoose.connect('mongodb://localhost:27017/twatter', { useNewUrlParser: true });
@@ -15,4 +14,6 @@ const bSchema = new mongoose.Schema({
     }]
 })
 
-module.exports = mongoose.model('blog', bSchema);
+const Blog = mongoose.model('blog', bSchema);
+
+export { Blog }

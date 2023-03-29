@@ -1,6 +1,6 @@
-const { logger } = require('mongodb');
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt')
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+
 mongoose.set('strictQuery', false);
 
 mongoose.connect('mongodb://localhost:27017/twatter', { useNewUrlParser: true });
@@ -28,4 +28,7 @@ uSchema.pre('save', async function (next) {
     this.password = await bcrypt.hash(this.password, 12);
     next();
 })
-module.exports = mongoose.model('user', uSchema);
+
+const User = mongoose.model('user', uSchema);
+
+export { User }
